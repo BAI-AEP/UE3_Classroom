@@ -1,7 +1,4 @@
-list_2d = [
-    ["Aria", "Olten", 3],
-    ["Dolder", "Zürich", 5]
-]
+from models import *
 
 
 def print_as_table(table: list, layout: list = None, header=None) -> None:
@@ -33,4 +30,23 @@ def print_as_table(table: list, layout: list = None, header=None) -> None:
         print()
 
 
-print_as_table(list_2d, layout=[20, 10, 10], header=["Name", "City", "Stars"])
+if __name__ == "__main__":
+    list_hotels = [
+        ["Aria", "Olten", 3],
+        ["Dolder", "Zürich", 5]
+    ]
+
+    print_as_table(list_hotels, layout=[20, 10, 10], header=["Name", "City", "Stars"])
+    print()
+    print()
+    hotels = [
+        Hotel(name="Hotel Amaris", stars=3,
+              address=Address(street="Tannwaldstrasse 34", zip="4600", city="Olten")),
+        Hotel(name="Leonardo Boutique Hotel Rigihof Zurich", stars=3,
+              address=Address(street=" Universitätstrasse 101", zip="8006", city="Zürich"))
+    ]
+    list_hotels = []
+    for hotel in hotels:
+        list_hotels.append([hotel.name, hotel.address.city, hotel.stars])
+
+    print_as_table(list_hotels, layout=[20, 10, 10], header=["Name", "City", "Stars"])
