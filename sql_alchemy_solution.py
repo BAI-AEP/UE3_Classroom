@@ -83,6 +83,15 @@ if __name__ == '__main__':
     input("Press Enter to continue...")
     print("\n")
 
+    # Let's get all Bookings ordered by Hotel
+    print("All Bookings ordered by room_hotel_id")
+    query = select(Booking).order_by(Booking.room_hotel_id)
+    result = session.execute(query).scalars().all()
+    for booking in result:
+        print(booking)
+    input("Press Enter to continue...")
+    print("\n")
+
     print("Laura is booking")
     booking_guest = 5  # Laura
     guest_query = select(RegisteredGuest).where(RegisteredGuest.id == booking_guest)
@@ -157,8 +166,10 @@ if __name__ == '__main__':
     # Let's select again the available rooms. The room with the id of selected_room should not be available.
     print(f"Is room with the number {selected_room.number} still available?")
     result_available_rooms = session.execute(query_available_rooms).scalars().all()
+    ids = []
     for room in result_available_rooms:
-        print(room)
+        ids.append(room.number)
+    print(ids)
     input("Press Enter to continue...")
     print("\n")
 
