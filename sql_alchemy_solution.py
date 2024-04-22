@@ -183,3 +183,22 @@ if __name__ == '__main__':
     for booking in laura_bookings:
         print(booking)
     input("Press Enter to continue...")
+
+    print("SQLAlchemy is also handeling equality")
+    hotel_1_query = select(Hotel).where(Hotel.id == 1)
+    hotel_also_1_query = select(Hotel).where(Hotel.id == 1)
+
+    result_1 = session.execute(hotel_1_query).scalars().one()
+    result_also_1 = session.execute(hotel_also_1_query).scalars().one()
+
+    print(result_1)
+    print(result_also_1)
+
+    input("Press Enter to continue...")
+    print("\n")
+    print(result_1 == result_also_1)
+
+    print("But Objects not!")
+    hotel_1 = Hotel(name="Hotel 1")
+    hotel_also_1 = Hotel(name="Hotel 1")
+    print(hotel_1 == hotel_also_1)
