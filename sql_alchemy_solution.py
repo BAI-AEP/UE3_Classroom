@@ -19,23 +19,33 @@ if __name__ == '__main__':
     # Tell SQL Alchemy how to connect to the db. In this case it's a sqlite db.
     engine = create_engine(f'sqlite:///{database_path}', echo=False)
 
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)
+    init_db(database_file, generate_example_data=True)
+
+    # Let's create a session to connect to the db.
     session = scoped_session(sessionmaker(bind=engine))
 
     # Get all hotels...
+    print("All Hotels:")
     query = select(Hotel)
     print(query)
     result = session.execute(query)
     for hotel in result:
         print(hotel)  # Notice that it will be a tuple, and not the object!
     input("Press Enter to continue...")
+    print("\n")
 
     # Therefore we use the sqlalchemy function to get scalars() and all() of them
+    print("All Hotels as objects:")
     result = session.execute(query).scalars().all()
     for hotel in result:
         print(hotel)
     input("Press Enter to continue...")
+    print("\n")
 
     # Now lets do a where and like, look how similar it is to sql what you have learned!
+    print("All Hotels where name like '%Amaris':")
     query = select(Hotel).where(Hotel.name.like('%Amaris'))
     print(query)
     result = session.execute(query).scalars().all()
@@ -45,57 +55,67 @@ if __name__ == '__main__':
         for room in hotel.rooms:
             print(room)
     input("Press Enter to continue...")
+    print("\n")
 
     # Let's get a specific hotel by it's id.
+    print("Hotel with id == 1")
     query = select(Hotel).where(Hotel.id == 1)
     result = session.execute(query).scalars().one()  # We use one() instead of all() (only one or raise Error!)
     print(result)
     input("Press Enter to continue...")
+    print("\n")
 
     # Let's get all rooms of Hotel 1
+    print("Rooms of Hotel with id == 1")
     query = select(Room).where(Room.hotel_id == 1)
     result = session.execute(query).scalars().all()
     # how many rooms are there?
     print(len(result))
     input("Press Enter to continue...")
+    print("\n")
 
     # Let's get all Bookings
+    print("All Bookings")
     query = select(Booking)
     result = session.execute(query).scalars().all()
     for booking in result:
         print(booking)
     input("Press Enter to continue...")
+    print("\n")
 
-    selected_hotel_id = 1  # we want to book a room in hotel with the id 1
+    print("Laura is booking")
     booking_guest = 5  # Laura
     guest_query = select(RegisteredGuest).where(RegisteredGuest.id == booking_guest)
     print(guest_query)
-    # We only have the registered guest with id == booking_guest once in db. So we use one().
+    # The user with the id == booking_guest only exists once. So we use one().
     laura = session.execute(guest_query).scalars().one()
     print(laura)
     input("Press Enter to continue...")
+    print("\n")
 
-    query_laura_bookings = select(Booking).where(Booking.guest == laura)
-    print(query_laura_bookings)
-    laura_bookings = session.execute(query_laura_bookings).scalars().all()
-    for booking in laura_bookings:
-        print(booking)
-    input("Press Enter to continue...")
-
+    print("Laura wants to book in Hotel 1")
+    selected_hotel_id = 1  # we want to book a room in hotel with the id 1
     # Let's get all Room numbers booked between start and end date. This will be used to exclude these rooms.
-    query_booked_rooms = (select(Room.number).
-                          join(Hotel).
-                          join(Booking).
-                          where(Hotel.id == selected_hotel_id,
-                                Booking.start_date.between(
-                                    date(2024, 2, 19), date(2024, 2, 20))
-                                )
-                          )
+    query_booked_rooms = (
+        select(Room.number).
+        join(Hotel).
+        join(Booking).
+        where(Hotel.id == selected_hotel_id,
+              (
+                      Booking.start_date.between(date.today(), date.today() + timedelta(days=3))
+                      |
+                      Booking.end_date.between(date.today(), date.today() + timedelta(days=3))
+              )
+              )
+    )
     print(query_booked_rooms)
     result_booked_rooms = session.execute(query_booked_rooms).scalars().all()
     print(result_booked_rooms)
     input("Press Enter to continue...")
+    print("\n")
 
+    print("Available rooms in Hotel 1")
+    # Let's combine the query to get available rooms
     query_available_rooms = (select(Room).
                              join(Hotel).
                              where(Hotel.id == selected_hotel_id,
@@ -104,11 +124,17 @@ if __name__ == '__main__':
                              )
     print(query_available_rooms)
     result_available_rooms = session.execute(query_available_rooms).scalars().all()
+    for room in result_available_rooms:
+        print(room)
     print(len(result_available_rooms))
     input("Press Enter to continue...")
+    print("\n")
 
-    print(result_available_rooms[0])
+    print("Laura selects first available room")
+    selected_room = result_available_rooms[0]
+    print(selected_room)
     input("Press Enter to continue...")
+    print("\n")
 
     # create new booking for laura
     booking = Booking(room=result_available_rooms[0], guest=laura, number_of_guests=1, start_date=date.today(),
@@ -119,12 +145,24 @@ if __name__ == '__main__':
     # commit the adding
     session.commit()
 
-    # test if the booking is saved
+    print("Get all booking of Laura")
+    query_laura_bookings = select(Booking).where(Booking.guest == laura)
+    print(query_laura_bookings)
     laura_bookings = session.execute(query_laura_bookings).scalars().all()
     for booking in laura_bookings:
         print(booking)
     input("Press Enter to continue...")
+    print("\n")
 
+    # Let's select again the available rooms. The room with the id of selected_room should not be available.
+    print(f"Is room with the number {selected_room.number} still available?")
+    result_available_rooms = session.execute(query_available_rooms).scalars().all()
+    for room in result_available_rooms:
+        print(room)
+    input("Press Enter to continue...")
+    print("\n")
+
+    print("Delete the booking again")
     # delete the booking.
     session.delete(booking)
     # commit the deleting.
