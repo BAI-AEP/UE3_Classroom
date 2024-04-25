@@ -1,4 +1,5 @@
 .idea
 .venv
 /data/
-sql_alchemy.py
+test/sql_alchemy.py
+/business/SearchManager.py

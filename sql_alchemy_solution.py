@@ -123,7 +123,7 @@ if __name__ == '__main__':
     input("Press Enter to continue...")
     print("\n")
 
-    print("Available rooms in Hotel 1")
+    print("Available rooms in Hotel")
     # Let's combine the query to get available rooms
     query_available_rooms = (select(Room).
                              join(Hotel).
