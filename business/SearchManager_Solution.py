@@ -70,7 +70,7 @@ if __name__ == '__main__':
         while not Path(os.environ.get("DB_FILE")).parent.is_dir():
             os.environ["DB_FILE"] = input("Enter relative Path to db file: ")
     search_manager = SearchManager()
-    all_hotels = search_manager.get_all_hotels()
+    all_hotels = search_manager.get_hotels()
     show(all_hotels)
     input("Press Enter to continue...")
 
