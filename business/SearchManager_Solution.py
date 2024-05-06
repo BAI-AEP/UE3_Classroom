@@ -72,6 +72,7 @@ if __name__ == '__main__':
     search_manager = SearchManager()
     all_hotels = search_manager.get_hotels()
     show(all_hotels)
+    all_hotels = search_manager.get_hotels()
     input("Press Enter to continue...")
 
     city_in = input('City: ')
