@@ -6,5 +6,3 @@ if __name__ == '__main__':
     hotels = sm.get_all_hotels()
     for hotel in hotels:
         print(hotel)
-        mein_print = print("HAHA")
-        print(mein_print)
